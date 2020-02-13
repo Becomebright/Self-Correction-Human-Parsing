@@ -4,7 +4,7 @@
 """
 @Author  :   Peike Li
 @Contact :   peike.li@yahoo.com
-@File    :   evaluate.py.py
+@File    :   evaluate.py.py.py
 @Time    :   8/30/19 8:59 PM
 @Desc    :   Evaluation Scripts
 @License :   This source code is licensed under the license found in the 
@@ -93,7 +93,7 @@ def main():
     input_size = dataset_settings[args.dataset]['input_size']
     label = dataset_settings[args.dataset]['label']
 
-    model = network(num_classes=num_classes, pretrained=None).cuda()
+    model = network(num_classes=num_classes, pretrained=None)
     model = nn.DataParallel(model)
     state_dict = torch.load(args.restore_weight)
     model.load_state_dict(state_dict)
@@ -121,11 +121,11 @@ def main():
             w = meta['width'].numpy()[0]
             h = meta['height'].numpy()[0]
 
-            output = model(image.cuda())
+            output = model(image)
             upsample = torch.nn.Upsample(size=input_size, mode='bilinear', align_corners=True)
             upsample_output = upsample(output)
             upsample_output = upsample_output.squeeze()
-            upsample_output = upsample_output.permute(1, 2, 0) #CHW -> HWC
+            upsample_output = upsample_output.permute(1, 2, 0)  #CHW -> HWC
 
             logits_result = transform_logits(upsample_output.data.cpu().numpy(), c, s, w, h, input_size=input_size)
             parsing_result = np.argmax(logits_result, axis=2)
